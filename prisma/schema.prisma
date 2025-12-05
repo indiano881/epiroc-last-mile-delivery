@@ -1,0 +1,264 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+    output   = "../generated/prisma"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHIPMENT DATA MODELS
+// ═══════════════════════════════════════════════════════════════
+
+model Shipment {
+    id                    String    @id @default(cuid())
+    loadId                String    @unique
+    carrierMode           String
+    actualShip            DateTime
+    actualDelivery        DateTime?
+    carrierServiceDays    Float?
+    truckloadServiceDays  Float?
+    customerDistance      Float
+    goalTransitDays       Int
+    actualTransitDays     Int?
+    otdDesignation        String?
+
+    // Location
+    originZip             String
+    destZip               String
+    laneZip3Pair          String
+    distanceBucket        String
+
+    // Temporal
+    shipDow               Int
+    shipWeek              Int
+    shipMonth             Int
+    shipYear              Int
+
+    // Enrichment: Holidays
+    isShipHoliday         Boolean   @default(false)
+    isDeliveryHoliday     Boolean   @default(false)
+    daysToHoliday         Int?
+    holidayName           String?
+    isHolidayWeek         Boolean   @default(false)
+
+    // Enrichment: Weather
+    originWeatherSeverity Float?
+    destWeatherSeverity   Float?
+    originPrecipitation   Float?
+    destPrecipitation     Float?
+    originSnowfall        Float?
+    destSnowfall          Float?
+    originTempMax         Float?
+    originTempMin         Float?
+
+    // Enrichment: Economic
+    freightIndex          Float?
+    fuelPrice             Float?
+    consumerSentiment     Float?
+
+    // Enrichment: Traffic Proxy
+    congestionScore       Float?
+    isRushHour            Boolean   @default(false)
+    isMonthEnd            Boolean   @default(false)
+    isQuarterEnd          Boolean   @default(false)
+
+    // Predictions
+    predictedDelay        Float?
+    predictionConfidence  Float?
+    delayRiskLevel        String?   // "low", "medium", "high"
+
+    // Relations
+    carrierId             String
+    carrier               Carrier   @relation(fields: [carrierId], references: [id])
+    laneId                String
+    lane                  Lane      @relation(fields: [laneId], references: [id])
+
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+
+    @@index([carrierMode])
+    @@index([shipYear, shipMonth])
+    @@index([otdDesignation])
+    @@index([originZip])
+    @@index([destZip])
+    @@index([carrierId])
+    @@index([laneId])
+}
+
+model Carrier {
+    id              String      @id @default(cuid())
+    pseudoId        String      @unique
+    name            String?
+
+    // Performance metrics (calculated)
+    totalShipments  Int         @default(0)
+    onTimeCount     Int         @default(0)
+    lateCount       Int         @default(0)
+    earlyCount      Int         @default(0)
+    historicalOtd   Float?      // percentage 0-100
+    avgDelayDays    Float?
+
+    shipments       Shipment[]
+
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+
+    @@index([historicalOtd])
+}
+
+model Lane {
+    id              String      @id @default(cuid())
+    zip3Pair        String      @unique
+    originZip       String
+    destZip         String
+
+    // Performance metrics (calculated)
+    totalShipments  Int         @default(0)
+    onTimeCount     Int         @default(0)
+    lateCount       Int         @default(0)
+    earlyCount      Int         @default(0)
+    historicalOtd   Float?      // percentage 0-100
+    avgTransitDays  Float?
+    avgDelayDays    Float?
+
+    shipments       Shipment[]
+
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+
+    @@index([historicalOtd])
+    @@index([originZip])
+    @@index([destZip])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// ENRICHMENT CACHE MODELS
+// ═══════════════════════════════════════════════════════════════
+
+model WeatherCache {
+    id              String    @id @default(cuid())
+    zip3            String
+    date            DateTime
+    latitude        Float?
+    longitude       Float?
+    tempMax         Float?
+    tempMin         Float?
+    precipitation   Float?
+    snowfall        Float?
+    windSpeedMax    Float?
+    weatherCode     Int?
+    severityScore   Float?    // 0-10 scale
+
+    createdAt       DateTime  @default(now())
+
+    @@unique([zip3, date])
+    @@index([zip3])
+    @@index([date])
+}
+
+model EconomicIndicator {
+    id                String    @id @default(cuid())
+    date              DateTime  @unique
+    month             Int
+    year              Int
+    freightIndex      Float?    // Cass Freight Shipment Index
+    fuelPrice         Float?    // Crude oil / diesel proxy
+    consumerSentiment Float?    // U of Michigan sentiment
+    joblessClaims     Float?    // Initial jobless claims
+
+    createdAt         DateTime  @default(now())
+
+    @@index([year, month])
+}
+
+model Holiday {
+    id              String    @id @default(cuid())
+    date            DateTime  @unique
+    name            String
+    isObserved      Boolean   @default(false)
+
+    @@index([date])
+}
+
+model ZipCodeMapping {
+    id              String    @id @default(cuid())
+    zip3            String    @unique
+    latitude        Float
+    longitude       Float
+    city            String?
+    state           String?
+    stateCode       String?
+
+    @@index([zip3])
+    @@index([stateCode])
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PREDICTION MODEL METADATA
+// ═══════════════════════════════════════════════════════════════
+
+model ModelVersion {
+    id              String    @id @default(cuid())
+    version         String
+    trainedAt       DateTime
+    metrics         String    // JSON string with MAE, RMSE, accuracy etc.
+    features        String    // JSON string with feature list
+    isActive        Boolean   @default(false)
+
+    createdAt       DateTime  @default(now())
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NEXT AUTH MODELS (simplified - remove if not using auth)
+// ═══════════════════════════════════════════════════════════════
+
+model User {
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+}
+
+model Account {
+    id                       String  @id @default(cuid())
+    userId                   String
+    type                     String
+    provider                 String
+    providerAccountId        String
+    refresh_token            String?
+    access_token             String?
+    expires_at               Int?
+    token_type               String?
+    scope                    String?
+    id_token                 String?
+    session_state            String?
+    user                     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    refresh_token_expires_in Int?
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
