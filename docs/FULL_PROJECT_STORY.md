@@ -67,15 +67,18 @@ Created `python/train_model.py` that:
 - Trains XGBoost classification (predict Late/On Time/Early)
 - Saves the model to `delay_model.joblib`
 
-**Results on 1,000 sample:**
-- MAE: 0.84 days
-- Classification Accuracy: 67%
+**Results on full dataset (72,966 shipments):**
+- Train/Test split: 58,370 / 14,596
+- Classification Accuracy: **74.7%**
+- MAE: **0.54 days**
+- R2: 0.056
 
 **Top predictive features:**
-1. `lane_avg_transit_days` (17.3%)
-2. `distance_bucket` (16.9%)
-3. `lane_otd_rate` (16.3%)
-4. `carrier_otd_rate` (7.9%)
+1. `all_modes_goal_transit_days` (11.7%)
+2. `lane_otd_rate` (11.1%)
+3. `carrier_otd_rate` (9.1%)
+4. `carrier_mode_encoded` (7.7%)
+5. `customer_distance` (7.0%)
 
 ### Step 5: Created the ML API Server
 Created `python/api_server.py` - a FastAPI server that:
@@ -116,9 +119,14 @@ Created `src/server/api/routers/shipment.ts` with endpoints:
 ### Step 8: Loaded All the Data
 Created `python/import_to_db.py` that:
 - Reads the enriched CSV
+- Sanitizes Unicode characters (replaced `→` with `->`)
 - Creates Carrier records (117)
 - Creates Lane records (970)
 - Inserts all 72,965 shipments
+
+**Bug Fixes Applied:**
+- Added `sanitize_string()` function to handle Unicode characters
+- Fixed DateTime format for Prisma SQLite compatibility (ISO 8601 with `Z` suffix)
 
 ---
 
@@ -128,7 +136,7 @@ Created `python/import_to_db.py` that:
 
 | Service | URL | What it does |
 |---------|-----|--------------|
-| Next.js App | http://localhost:3001 | Main UI |
+| Next.js App | http://localhost:3000 | Main UI |
 | ML API | http://localhost:8000 | Predictions |
 | Prisma Studio | http://localhost:5555 | Browse database |
 
@@ -146,6 +154,15 @@ Created `python/import_to_db.py` that:
 - **On Time**: 46,609 shipments (63.9%)
 - **Early**: 12,358 shipments (16.9%)
 - **Late**: 13,998 shipments (19.2%)
+
+### ML Model Performance
+
+| Metric | Value |
+|--------|-------|
+| Classification Accuracy | **74.7%** |
+| MAE (Mean Absolute Error) | **0.54 days** |
+| Training Samples | 58,370 |
+| Test Samples | 14,596 |
 
 ---
 
@@ -176,13 +193,16 @@ epiroc-lastmile/
 │   ├── import_to_db.py           # Database import script
 │   ├── enriched_shipments.csv    # 73k enriched rows
 │   ├── delay_model.joblib        # Trained model
+│   ├── model_metadata.json       # Model metrics and feature importance
 │   └── requirements.txt          # Python dependencies
 ├── prisma/
 │   ├── schema.prisma             # Database schema
 │   └── db.sqlite                 # SQLite database (73k rows)
 └── docs/
     ├── SLACK_MESSAGE.md          # Message for team
+    ├── DISCORD_MESSAGE.md        # Discord message template
     ├── CONTINUE_TOMORROW.md      # Instructions for tomorrow
+    ├── WHAT_WE_BUILT.md          # Architecture overview
     └── FULL_PROJECT_STORY.md     # This file
 ```
 
@@ -195,12 +215,13 @@ epiroc-lastmile/
 3. **Real Data** - 73k actual shipments, not fake data
 4. **Full Stack** - End-to-end from data enrichment to ML to UI
 5. **Actionable** - Analytics page gives concrete recommendations
+6. **High Accuracy** - 74.7% classification accuracy on unseen data
 
 ---
 
-## What's Next
+## What's Next (Optional Improvements)
 
-1. **Retrain on full data** - ML model was trained on 1k sample, should train on all 73k
-2. **Add weather** - Open-Meteo API is free and ready to integrate
-3. **Polish UI** - Loading states, animations, mobile view
-4. **Demo prep** - Create compelling example scenarios
+1. **Add weather data** - Open-Meteo API is free and ready to integrate
+2. **Polish UI** - Loading states, animations, mobile view
+3. **Demo prep** - Create compelling example scenarios
+4. **Deploy** - Push to Vercel/Railway for live demo

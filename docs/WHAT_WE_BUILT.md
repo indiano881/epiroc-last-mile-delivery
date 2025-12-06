@@ -9,12 +9,12 @@ An AI-powered ETA prediction system that shows users a simple **+/- days** delay
 ## Architecture
 
 ```
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Next.js UI    │────▶│   tRPC API      │────▶│  FastAPI + ML   │
-│  (Dashboard,    │     │  (Prisma DB)    │     │  (XGBoost)      │
-│   Predictor,    │     │                 │     │                 │
-│   Analytics)    │     │                 │     │                 │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
++------------------+     +------------------+     +------------------+
+|   Next.js UI     |---->|   tRPC API       |---->|  FastAPI + ML    |
+|  (Dashboard,     |     |  (Prisma DB)     |     |  (XGBoost)       |
+|   Predictor,     |     |                  |     |                  |
+|   Analytics)     |     |                  |     |                  |
++------------------+     +------------------+     +------------------+
 ```
 
 ## Key Features
@@ -39,21 +39,22 @@ An AI-powered ETA prediction system that shows users a simple **+/- days** delay
 
 ## ML Model Details
 
-**Training data:** 1,000 shipments (sampled from 70k)
+**Training data:** 72,966 shipments (full dataset)
+- Train set: 58,370 samples
+- Test set: 14,596 samples
 
-**Features used:**
-- `lane_avg_transit_days` (most important)
-- `distance_bucket`
-- `lane_otd_rate`
-- `carrier_otd_rate`
-- `ship_week`
-- `carrier_mode`
-- `days_to_holiday`
-- `congestion_score`
+**Performance (Retrained on Full Data):**
+- Classification Accuracy: **74.7%**
+- MAE: **0.54 days**
 
-**Performance:**
-- MAE: 0.84 days
-- Classification accuracy: 67%
+**Top Features (by importance):**
+1. `all_modes_goal_transit_days` (11.7%)
+2. `lane_otd_rate` (11.1%)
+3. `carrier_otd_rate` (9.1%)
+4. `carrier_mode_encoded` (7.7%)
+5. `customer_distance` (7.0%)
+6. `is_quarter_end` (6.4%)
+7. `lane_avg_transit_days` (5.8%)
 
 ## Data Enrichment
 
@@ -62,6 +63,20 @@ An AI-powered ETA prediction system that shows users a simple **+/- days** delay
 | Python `holidays` | US holiday detection, days_to_holiday |
 | Derived features | Traffic proxy, congestion score, rush hour |
 | Historical data | Carrier OTD rate, lane OTD rate, avg transit days |
+
+## Database Contents
+
+| Table | Records |
+|-------|---------|
+| Shipments | 72,965 |
+| Carriers | 117 |
+| Lanes | 970 |
+
+**OTD Breakdown:**
+- On Time: 63.9%
+- Early: 16.9%
+- Late: 19.2%
+- **Overall OTD Rate: 80.8%**
 
 ## Files Structure
 
@@ -77,7 +92,9 @@ epiroc-lastmile/
 │   ├── enrich_data.py     # Data enrichment pipeline
 │   ├── train_model.py     # ML training script
 │   ├── api_server.py      # FastAPI server
-│   └── delay_model.joblib # Trained model
+│   ├── import_to_db.py    # Database import (with sanitization)
+│   ├── delay_model.joblib # Trained model
+│   └── model_metadata.json # Model metrics
 └── prisma/schema.prisma   # Database schema
 ```
 
@@ -87,4 +104,33 @@ epiroc-lastmile/
 2. **Explainable AI**: Shows which factors contribute to the prediction
 3. **Actionable insights**: Analytics page gives concrete recommendations
 4. **Full stack**: End-to-end from data to ML to UI
-5. **Real data patterns**: Model captures actual shipment patterns
+5. **Real data**: 73k actual shipments, not fake data
+6. **High accuracy**: 74.7% on unseen test data
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | Next.js 14 + TypeScript + Tailwind CSS |
+| API | tRPC (type-safe) |
+| Database | SQLite + Prisma ORM |
+| ML Model | XGBoost (Python) |
+| ML API | FastAPI |
+
+## Running the App
+
+```bash
+# Terminal 1: ML API
+cd python && python3 api_server.py
+
+# Terminal 2: Next.js
+npm run dev
+
+# Terminal 3: Prisma Studio (optional)
+npx prisma studio
+```
+
+URLs:
+- App: http://localhost:3000
+- ML API: http://localhost:8000
+- Prisma Studio: http://localhost:5555

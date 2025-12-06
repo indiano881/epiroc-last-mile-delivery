@@ -1,4 +1,4 @@
-# Instructions to Continue Tomorrow
+# Instructions to Continue Working
 
 ## Quick Start (Get Everything Running)
 
@@ -47,21 +47,40 @@ Runs on http://localhost:5555
 - 970 lanes
 - OTD Rate: 80.8%
 
-**ML Model:**
-- Trained on 1,000 samples (should retrain on full data)
-- 67% classification accuracy
-- MAE: 0.84 days
+**ML Model (Retrained on Full Dataset):**
+- Trained on 58,370 samples (80% of 72,966)
+- Test set: 14,596 samples
+- **Classification accuracy: 74.7%**
+- **MAE: 0.54 days**
+
+**Top Predictive Features:**
+1. `all_modes_goal_transit_days` (11.7%)
+2. `lane_otd_rate` (11.1%)
+3. `carrier_otd_rate` (9.1%)
+4. `carrier_mode_encoded` (7.7%)
+5. `customer_distance` (7.0%)
 
 ---
 
-## Priority Tasks for Tomorrow
+## What's Been Completed
 
-### 1. Retrain ML on Full Data (Recommended)
+1. Full data enrichment pipeline with holidays, traffic proxy, carrier/lane performance
+2. Database import with sanitized Unicode characters and proper DateTime format
+3. ML model trained on full 72,966 shipments
+4. All three UI pages working (Dashboard, Predictor, Analytics)
+5. ML API serving predictions
+
+---
+
+## Optional Next Steps
+
+### 1. Add Weather Data
 ```bash
 cd /Users/davidebaldi/Desktop/epiroc/epiroc-lastmile/python
-python3 train_model.py
+# Edit enrich_data.py to enable weather API calls
+python3 enrich_data.py
+python3 train_model.py  # Retrain with weather features
 ```
-This will use all 72,965 shipments and improve accuracy significantly.
 
 ### 2. Prepare Demo Scenarios
 Create 3-4 example predictions to show:
@@ -73,6 +92,10 @@ Create 3-4 example predictions to show:
 - Add loading states
 - Improve mobile view
 - Add more animations
+
+### 4. Deploy to Cloud
+- Vercel for Next.js frontend
+- Railway or Render for FastAPI backend
 
 ---
 
@@ -86,6 +109,7 @@ Create 3-4 example predictions to show:
 | API Routes | `src/server/api/routers/shipment.ts` |
 | ML API | `python/api_server.py` |
 | ML Training | `python/train_model.py` |
+| Data Import | `python/import_to_db.py` |
 
 ---
 
@@ -115,9 +139,19 @@ lsof -i :3000  # Find process
 kill -9 <PID>  # Kill it
 ```
 
+### Prisma Studio shows character errors
+The data has already been sanitized. If you see issues:
+1. Check that `import_to_db.py` has the `sanitize_string()` function
+2. Re-run the import script
+
 ---
 
 ## Project Location
 ```
 /Users/davidebaldi/Desktop/epiroc/epiroc-lastmile/
+```
+
+## GitHub Repository
+```
+https://github.com/indiano881/epiroc-last-mile-delivery
 ```
