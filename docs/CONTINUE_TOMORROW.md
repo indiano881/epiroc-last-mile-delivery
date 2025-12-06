@@ -46,40 +46,44 @@ Runs on http://localhost:5555
 - 117 carriers
 - 970 lanes
 - OTD Rate: 80.8%
+- Weather data for 11,450 shipments
+- FRED economic indicators (freight index, fuel price, consumer sentiment)
 
-**ML Model (Retrained on Full Dataset):**
+**ML Model (Retrained with Weather + Economic Data):**
 - Trained on 58,370 samples (80% of 72,966)
 - Test set: 14,596 samples
-- **Classification accuracy: 74.7%**
-- **MAE: 0.54 days**
+- **Classification accuracy: 74.8%**
+- **MAE: 0.55 days**
 
 **Top Predictive Features:**
-1. `all_modes_goal_transit_days` (11.7%)
-2. `lane_otd_rate` (11.1%)
-3. `carrier_otd_rate` (9.1%)
-4. `carrier_mode_encoded` (7.7%)
-5. `customer_distance` (7.0%)
+1. `all_modes_goal_transit_days` (9.4%)
+2. `origin_weather_severity` (8.8%) - Weather is #2!
+3. `lane_otd_rate` (8.3%)
+4. `carrier_mode_encoded` (6.8%)
+5. `carrier_otd_rate` (6.7%)
 
 ---
 
 ## What's Been Completed
 
-1. Full data enrichment pipeline with holidays, traffic proxy, carrier/lane performance
-2. Database import with sanitized Unicode characters and proper DateTime format
-3. ML model trained on full 72,966 shipments
-4. All three UI pages working (Dashboard, Predictor, Analytics)
-5. ML API serving predictions
+1. Full data enrichment pipeline with holidays, weather, FRED economic data, carrier/lane performance
+2. Weather data from Open-Meteo API (11,450 shipments with temp, precipitation, snowfall, severity)
+3. Economic indicators from FRED API (freight index, fuel price, consumer sentiment)
+4. Database import with sanitized Unicode characters and proper DateTime format
+5. ML model trained on full 72,966 shipments with weather + economic features
+6. All three UI pages working (Dashboard, Predictor, Analytics)
+7. ML API serving predictions
 
 ---
 
 ## Optional Next Steps
 
-### 1. Add Weather Data
+### 1. Expand Weather Coverage (Currently 11,450 shipments)
 ```bash
 cd /Users/davidebaldi/Desktop/epiroc/epiroc-lastmile/python
-# Edit enrich_data.py to enable weather API calls
-python3 enrich_data.py
-python3 train_model.py  # Retrain with weather features
+# Edit enrich_data.py to increase WEATHER_SAMPLE_SIZE
+python3 enrich_data.py --weather-sample 5000  # More coverage
+python3 train_model.py  # Retrain with more weather data
 ```
 
 ### 2. Prepare Demo Scenarios

@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "trained_at": "2025-12-06T19:02:08.793793",
+  "trained_at": "2025-12-06T19:28:00.165018",
   "train_samples": 58370,
   "test_samples": 14596,
   "features": [
@@ -29,12 +29,12 @@
   ],
   "metrics": {
     "regression": {
-      "mae": 0.5428341627120972,
-      "rmse": 2.4212845605560815,
-      "r2": 0.05507516860961914
+      "mae": 0.5542345643043518,
+      "rmse": 2.4252202710660526,
+      "r2": 0.05200088024139404
     },
     "classification": {
-      "accuracy": 0.7482872019731434,
+      "accuracy": 0.7482186900520691,
       "classes": [
         "Delivered Early",
         "Late",
@@ -45,91 +45,91 @@
   "feature_importance": [
     {
       "feature": "all_modes_goal_transit_days",
-      "importance": 0.09045567363500595
-    },
-    {
-      "feature": "lane_otd_rate",
-      "importance": 0.08717887848615646
-    },
-    {
-      "feature": "is_holiday_week_encoded",
-      "importance": 0.07887580245733261
-    },
-    {
-      "feature": "carrier_otd_rate",
-      "importance": 0.07145044207572937
-    },
-    {
-      "feature": "carrier_mode_encoded",
-      "importance": 0.06834224611520767
-    },
-    {
-      "feature": "is_quarter_end_encoded",
-      "importance": 0.06696577370166779
-    },
-    {
-      "feature": "customer_distance",
-      "importance": 0.05978276953101158
-    },
-    {
-      "feature": "freight_index",
-      "importance": 0.05120745673775673
-    },
-    {
-      "feature": "ship_dow",
-      "importance": 0.04643777012825012
-    },
-    {
-      "feature": "lane_avg_transit_days",
-      "importance": 0.04348699375987053
-    },
-    {
-      "feature": "ship_week",
-      "importance": 0.03830292075872421
-    },
-    {
-      "feature": "congestion_score",
-      "importance": 0.03756194934248924
-    },
-    {
-      "feature": "days_to_holiday",
-      "importance": 0.03641916811466217
-    },
-    {
-      "feature": "consumer_sentiment",
-      "importance": 0.03641659393906593
-    },
-    {
-      "feature": "distance_bucket_encoded",
-      "importance": 0.03635457530617714
-    },
-    {
-      "feature": "is_rush_hour_encoded",
-      "importance": 0.03302036598324776
-    },
-    {
-      "feature": "ship_month",
-      "importance": 0.03296183422207832
-    },
-    {
-      "feature": "fuel_price",
-      "importance": 0.031009232625365257
-    },
-    {
-      "feature": "is_weekend_encoded",
-      "importance": 0.021000364795327187
-    },
-    {
-      "feature": "is_month_end_encoded",
-      "importance": 0.018559139221906662
-    },
-    {
-      "feature": "is_ship_holiday_encoded",
-      "importance": 0.01421012356877327
+      "importance": 0.09360911697149277
     },
     {
       "feature": "origin_weather_severity",
-      "importance": 0.0
+      "importance": 0.08844354003667831
+    },
+    {
+      "feature": "lane_otd_rate",
+      "importance": 0.08325286209583282
+    },
+    {
+      "feature": "carrier_mode_encoded",
+      "importance": 0.0684019923210144
+    },
+    {
+      "feature": "carrier_otd_rate",
+      "importance": 0.0670330822467804
+    },
+    {
+      "feature": "customer_distance",
+      "importance": 0.053684383630752563
+    },
+    {
+      "feature": "freight_index",
+      "importance": 0.052831679582595825
+    },
+    {
+      "feature": "congestion_score",
+      "importance": 0.05233641713857651
+    },
+    {
+      "feature": "is_quarter_end_encoded",
+      "importance": 0.04645929113030434
+    },
+    {
+      "feature": "lane_avg_transit_days",
+      "importance": 0.04480141028761864
+    },
+    {
+      "feature": "ship_dow",
+      "importance": 0.04141778126358986
+    },
+    {
+      "feature": "ship_week",
+      "importance": 0.040373750030994415
+    },
+    {
+      "feature": "distance_bucket_encoded",
+      "importance": 0.03970895707607269
+    },
+    {
+      "feature": "consumer_sentiment",
+      "importance": 0.03955092281103134
+    },
+    {
+      "feature": "days_to_holiday",
+      "importance": 0.03490092232823372
+    },
+    {
+      "feature": "fuel_price",
+      "importance": 0.033669158816337585
+    },
+    {
+      "feature": "ship_month",
+      "importance": 0.031047938391566277
+    },
+    {
+      "feature": "is_holiday_week_encoded",
+      "importance": 0.025580648332834244
+    },
+    {
+      "feature": "is_rush_hour_encoded",
+      "importance": 0.024445855990052223
+    },
+    {
+      "feature": "is_weekend_encoded",
+      "importance": 0.014777736738324165
+    },
+    {
+      "feature": "is_month_end_encoded",
+      "importance": 0.013655413873493671
+    },
+    {
+      "feature": "is_ship_holiday_encoded",
+      "importance": 0.010017186403274536
     }
   ]
 }

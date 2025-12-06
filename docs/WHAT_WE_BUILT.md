@@ -43,24 +43,27 @@ An AI-powered ETA prediction system that shows users a simple **+/- days** delay
 - Train set: 58,370 samples
 - Test set: 14,596 samples
 
-**Performance (Retrained on Full Data):**
-- Classification Accuracy: **74.7%**
-- MAE: **0.54 days**
+**Performance (Retrained with Weather + Economic Data):**
+- Classification Accuracy: **74.8%**
+- MAE: **0.55 days**
+- R2: 0.052
 
 **Top Features (by importance):**
-1. `all_modes_goal_transit_days` (11.7%)
-2. `lane_otd_rate` (11.1%)
-3. `carrier_otd_rate` (9.1%)
-4. `carrier_mode_encoded` (7.7%)
-5. `customer_distance` (7.0%)
-6. `is_quarter_end` (6.4%)
-7. `lane_avg_transit_days` (5.8%)
+1. `all_modes_goal_transit_days` (9.4%)
+2. `origin_weather_severity` (8.8%) - NEW!
+3. `lane_otd_rate` (8.3%)
+4. `carrier_mode_encoded` (6.8%)
+5. `carrier_otd_rate` (6.7%)
+6. `customer_distance` (5.4%)
+7. `freight_index` (5.3%)
 
 ## Data Enrichment
 
 | Source | What it adds |
 |--------|--------------|
-| Python `holidays` | US holiday detection, days_to_holiday |
+| Python `holidays` | US holiday detection, days_to_holiday, holiday week |
+| Open-Meteo API | Weather data (temp, precipitation, snowfall, severity) |
+| FRED API | Economic indicators (freight index, fuel price, consumer sentiment) |
 | Derived features | Traffic proxy, congestion score, rush hour |
 | Historical data | Carrier OTD rate, lane OTD rate, avg transit days |
 
@@ -105,7 +108,8 @@ epiroc-lastmile/
 3. **Actionable insights**: Analytics page gives concrete recommendations
 4. **Full stack**: End-to-end from data to ML to UI
 5. **Real data**: 73k actual shipments, not fake data
-6. **High accuracy**: 74.7% on unseen test data
+6. **Weather matters**: Weather severity is the #2 most important predictor!
+7. **High accuracy**: 74.8% on unseen test data
 
 ## Tech Stack
 

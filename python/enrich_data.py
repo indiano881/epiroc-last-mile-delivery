@@ -402,11 +402,12 @@ def enrich_weather(df: pd.DataFrame, sample_size: Optional[int] = None) -> pd.Da
     print("Enriching with weather data...")
 
     # Get unique ZIP3 + date combinations
-    origin_combos = df[['origin_zip_3d', 'actual_ship']].drop_duplicates()
+    origin_combos = df[['origin_zip_3d', 'actual_ship']].drop_duplicates().copy()
     origin_combos['date_str'] = origin_combos['actual_ship'].dt.strftime('%Y-%m-%d')
 
-    if sample_size:
-        origin_combos = origin_combos.head(sample_size)
+    # Sample randomly if requested
+    if sample_size and len(origin_combos) > sample_size:
+        origin_combos = origin_combos.sample(n=sample_size, random_state=42)
 
     # Cache for weather data
     weather_cache = {}
@@ -439,24 +440,32 @@ def enrich_weather(df: pd.DataFrame, sample_size: Optional[int] = None) -> pd.Da
             # Rate limiting
             time.sleep(0.1)
 
-    # Apply weather data to dataframe
-    def get_origin_weather(row, field):
-        cache_key = f"{row['origin_zip_3d']}_{row['actual_ship'].strftime('%Y-%m-%d')}"
-        return weather_cache.get(cache_key, {}).get(field)
+    print(f"Weather data fetched for {len(weather_cache)} unique combinations")
 
-    df['origin_temp_max'] = df.apply(lambda r: get_origin_weather(r, 'temp_max'), axis=1)
-    df['origin_temp_min'] = df.apply(lambda r: get_origin_weather(r, 'temp_min'), axis=1)
-    df['origin_precipitation'] = df.apply(lambda r: get_origin_weather(r, 'precipitation'), axis=1)
-    df['origin_snowfall'] = df.apply(lambda r: get_origin_weather(r, 'snowfall'), axis=1)
+    # Create a cache key column for efficient lookup
+    df['_weather_cache_key'] = df['origin_zip_3d'] + '_' + df['actual_ship'].dt.strftime('%Y-%m-%d')
+
+    # Apply weather data to dataframe using vectorized operations where possible
+    df['origin_temp_max'] = df['_weather_cache_key'].map(lambda k: weather_cache.get(k, {}).get('temp_max'))
+    df['origin_temp_min'] = df['_weather_cache_key'].map(lambda k: weather_cache.get(k, {}).get('temp_min'))
+    df['origin_precipitation'] = df['_weather_cache_key'].map(lambda k: weather_cache.get(k, {}).get('precipitation'))
+    df['origin_snowfall'] = df['_weather_cache_key'].map(lambda k: weather_cache.get(k, {}).get('snowfall'))
+
+    # Count how many rows got weather data
+    weather_count = df['origin_temp_max'].notna().sum()
+    print(f"Weather data applied to {weather_count:,} shipments ({weather_count/len(df)*100:.1f}%)")
 
     # Calculate severity scores
     df['origin_weather_severity'] = df.apply(
         lambda r: calculate_weather_severity({
             'precipitation': r['origin_precipitation'],
             'snowfall': r['origin_snowfall'],
-            'wind_speed_max': get_origin_weather(r, 'wind_speed_max')
+            'wind_speed_max': weather_cache.get(r['_weather_cache_key'], {}).get('wind_speed_max')
         }), axis=1
     )
+
+    # Clean up temp column
+    df = df.drop(columns=['_weather_cache_key'])
 
     return df
 
