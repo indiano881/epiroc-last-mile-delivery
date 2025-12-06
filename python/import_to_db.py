@@ -9,6 +9,15 @@ from pathlib import Path
 from datetime import datetime
 import uuid
 
+def sanitize_string(val):
+    """Remove non-ASCII characters from strings to avoid SQLite/Prisma issues."""
+    if val is None or pd.isna(val):
+        return None
+    s = str(val)
+    # Replace common unicode arrows and encode to ASCII, ignoring errors
+    s = s.replace('→', '->').replace('\u2192', '->')
+    return s.encode('ascii', 'ignore').decode('ascii')
+
 # Paths
 CSV_PATH = Path(__file__).parent / "enriched_shipments.csv"
 DB_PATH = Path(__file__).parent.parent / "prisma" / "db.sqlite"
@@ -59,8 +68,8 @@ def main():
 
         cursor.execute(carrier_insert, (
             str(uuid.uuid4()),  # id
-            str(carrier_id)[:50],  # pseudoId
-            f"Carrier {str(carrier_id)[:8]}",  # name
+            sanitize_string(carrier_id)[:50],  # pseudoId
+            sanitize_string(f"Carrier {str(carrier_id)[:8]}"),  # name
             total,  # totalShipments
             on_time,  # onTimeCount
             late,  # lateCount
@@ -104,9 +113,9 @@ def main():
 
         cursor.execute(lane_insert, (
             str(uuid.uuid4()),  # id
-            str(lane_id)[:20],  # zip3Pair
-            origin[:10],  # originZip
-            dest[:10],  # destZip
+            sanitize_string(lane_id)[:20],  # zip3Pair
+            sanitize_string(origin)[:10],  # originZip
+            sanitize_string(dest)[:10],  # destZip
             total,  # totalShipments
             on_time,  # onTimeCount
             late,  # lateCount
@@ -147,11 +156,11 @@ def main():
             delivery_date = pd.to_datetime(row.get('actual_delivery')) if pd.notna(row.get('actual_delivery')) else None
 
             # Get OTD designation from data
-            otd_designation = str(row.get('otd_designation', 'Unknown'))
+            otd_designation = sanitize_string(row.get('otd_designation', 'Unknown'))
 
             # Get carrier and lane IDs
-            carrier_pseudo = str(row.get('carrier_pseudo', ''))[:50]
-            lane_zip3 = str(row.get('lane_id', ''))[:20]
+            carrier_pseudo = sanitize_string(row.get('carrier_pseudo', ''))[:50]
+            lane_zip3 = sanitize_string(row.get('lane_id', ''))[:20]
 
             carrier_id = carrier_map.get(carrier_pseudo, list(carrier_map.values())[0] if carrier_map else None)
             lane_id = lane_map.get(lane_zip3, list(lane_map.values())[0] if lane_map else None)
@@ -161,8 +170,8 @@ def main():
 
             cursor.execute(insert_sql, (
                 str(uuid.uuid4()),  # id
-                str(row.get('load_id_pseudo', f'LOAD-{idx}'))[:50],  # loadId
-                str(row.get('carrier_mode', 'LTL')),  # carrierMode
+                sanitize_string(row.get('load_id_pseudo', f'LOAD-{idx}'))[:50],  # loadId
+                sanitize_string(row.get('carrier_mode', 'LTL')),  # carrierMode
                 ship_date.isoformat(),  # actualShip
                 delivery_date.isoformat() if delivery_date else None,  # actualDelivery
                 float(row['carrier_posted_service_days']) if pd.notna(row.get('carrier_posted_service_days')) else None,  # carrierServiceDays
@@ -171,10 +180,10 @@ def main():
                 int(row['all_modes_goal_transit_days']) if pd.notna(row.get('all_modes_goal_transit_days')) else 3,  # goalTransitDays
                 int(row['actual_transit_days']) if pd.notna(row.get('actual_transit_days')) else None,  # actualTransitDays
                 otd_designation,  # otdDesignation
-                str(row.get('origin_zip_3d', '000'))[:10],  # originZip
-                str(row.get('dest_zip_3d', '000'))[:10],  # destZip
-                str(row.get('lane_zip3_pair', '000-000'))[:20],  # laneZip3Pair
-                str(row.get('distance_bucket', '0-100'))[:20],  # distanceBucket
+                sanitize_string(row.get('origin_zip_3d', '000'))[:10],  # originZip
+                sanitize_string(row.get('dest_zip_3d', '000'))[:10],  # destZip
+                sanitize_string(row.get('lane_zip3_pair', '000-000'))[:20],  # laneZip3Pair
+                sanitize_string(row.get('distance_bucket', '0-100'))[:20],  # distanceBucket
                 int(row['ship_dow']) if pd.notna(row.get('ship_dow')) else ship_date.weekday(),  # shipDow
                 int(row['ship_week']) if pd.notna(row.get('ship_week')) else ship_date.isocalendar()[1],  # shipWeek
                 int(row['ship_month']) if pd.notna(row.get('ship_month')) else ship_date.month,  # shipMonth
@@ -182,7 +191,7 @@ def main():
                 bool(row.get('is_ship_holiday', False)),  # isShipHoliday
                 bool(row.get('is_delivery_holiday', False)),  # isDeliveryHoliday
                 int(row['days_to_holiday']) if pd.notna(row.get('days_to_holiday')) else None,  # daysToHoliday
-                str(row.get('holiday_name', ''))[:100] if pd.notna(row.get('holiday_name')) else None,  # holidayName
+                sanitize_string(row.get('holiday_name', ''))[:100] if pd.notna(row.get('holiday_name')) else None,  # holidayName
                 bool(row.get('is_holiday_week', False)),  # isHolidayWeek
                 float(row['congestion_score']) if pd.notna(row.get('congestion_score')) else None,  # congestionScore
                 bool(row.get('is_rush_hour', False)),  # isRushHour
