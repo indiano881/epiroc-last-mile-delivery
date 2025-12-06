@@ -29,6 +29,19 @@ ENRICHED_DATA_PATH = "./enriched_shipments.csv"
 ZIP_MAPPING_PATH = "./zip3_coordinates.json"
 
 # API Keys (get your free FRED key at https://fred.stlouisfed.org/docs/api/api_key.html)
+# Try to load from .env file first
+def load_env_file():
+    env_path = os.path.join(os.path.dirname(__file__), '..', '.env')
+    if os.path.exists(env_path):
+        with open(env_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    value = value.strip('"').strip("'")
+                    os.environ[key] = value
+
+load_env_file()
 FRED_API_KEY = os.getenv("FRED_API_KEY", "YOUR_FRED_API_KEY_HERE")
 
 # Open-Meteo Historical API (FREE, no key needed)

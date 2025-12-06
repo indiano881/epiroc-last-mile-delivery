@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "trained_at": "2025-12-06T18:47:01.768278",
+  "trained_at": "2025-12-06T19:02:08.793793",
   "train_samples": 58370,
   "test_samples": 14596,
   "features": [
@@ -29,12 +29,12 @@
   ],
   "metrics": {
     "regression": {
-      "mae": 0.5396093726158142,
-      "rmse": 2.4174797290792394,
-      "r2": 0.05804264545440674
+      "mae": 0.5428341627120972,
+      "rmse": 2.4212845605560815,
+      "r2": 0.05507516860961914
     },
     "classification": {
-      "accuracy": 0.7452041655248013,
+      "accuracy": 0.7482872019731434,
       "classes": [
         "Delivered Early",
         "Late",
@@ -44,91 +44,91 @@
   },
   "feature_importance": [
     {
-      "feature": "is_holiday_week_encoded",
-      "importance": 0.11660850048065186
-    },
-    {
       "feature": "all_modes_goal_transit_days",
-      "importance": 0.11106564104557037
+      "importance": 0.09045567363500595
     },
     {
       "feature": "lane_otd_rate",
-      "importance": 0.1072230339050293
+      "importance": 0.08717887848615646
+    },
+    {
+      "feature": "is_holiday_week_encoded",
+      "importance": 0.07887580245733261
     },
     {
       "feature": "carrier_otd_rate",
-      "importance": 0.08132144063711166
+      "importance": 0.07145044207572937
     },
     {
       "feature": "carrier_mode_encoded",
-      "importance": 0.06734801083803177
-    },
-    {
-      "feature": "customer_distance",
-      "importance": 0.0657712072134018
-    },
-    {
-      "feature": "lane_avg_transit_days",
-      "importance": 0.054226167500019073
+      "importance": 0.06834224611520767
     },
     {
       "feature": "is_quarter_end_encoded",
-      "importance": 0.05203709006309509
+      "importance": 0.06696577370166779
     },
     {
-      "feature": "ship_week",
-      "importance": 0.043239105492830276
-    },
-    {
-      "feature": "distance_bucket_encoded",
-      "importance": 0.03954876586794853
-    },
-    {
-      "feature": "days_to_holiday",
-      "importance": 0.037080079317092896
-    },
-    {
-      "feature": "is_rush_hour_encoded",
-      "importance": 0.0366128571331501
-    },
-    {
-      "feature": "origin_weather_severity",
-      "importance": 0.035638172179460526
-    },
-    {
-      "feature": "ship_month",
-      "importance": 0.03483234718441963
-    },
-    {
-      "feature": "ship_dow",
-      "importance": 0.03415129333734512
-    },
-    {
-      "feature": "congestion_score",
-      "importance": 0.03100450150668621
-    },
-    {
-      "feature": "is_weekend_encoded",
-      "importance": 0.028819343075156212
-    },
-    {
-      "feature": "is_month_end_encoded",
-      "importance": 0.015647150576114655
-    },
-    {
-      "feature": "is_ship_holiday_encoded",
-      "importance": 0.007825260050594807
+      "feature": "customer_distance",
+      "importance": 0.05978276953101158
     },
     {
       "feature": "freight_index",
-      "importance": 0.0
+      "importance": 0.05120745673775673
     },
     {
-      "feature": "fuel_price",
-      "importance": 0.0
+      "feature": "ship_dow",
+      "importance": 0.04643777012825012
+    },
+    {
+      "feature": "lane_avg_transit_days",
+      "importance": 0.04348699375987053
+    },
+    {
+      "feature": "ship_week",
+      "importance": 0.03830292075872421
+    },
+    {
+      "feature": "congestion_score",
+      "importance": 0.03756194934248924
+    },
+    {
+      "feature": "days_to_holiday",
+      "importance": 0.03641916811466217
     },
     {
       "feature": "consumer_sentiment",
+      "importance": 0.03641659393906593
+    },
+    {
+      "feature": "distance_bucket_encoded",
+      "importance": 0.03635457530617714
+    },
+    {
+      "feature": "is_rush_hour_encoded",
+      "importance": 0.03302036598324776
+    },
+    {
+      "feature": "ship_month",
+      "importance": 0.03296183422207832
+    },
+    {
+      "feature": "fuel_price",
+      "importance": 0.031009232625365257
+    },
+    {
+      "feature": "is_weekend_encoded",
+      "importance": 0.021000364795327187
+    },
+    {
+      "feature": "is_month_end_encoded",
+      "importance": 0.018559139221906662
+    },
+    {
+      "feature": "is_ship_holiday_encoded",
+      "importance": 0.01421012356877327
+    },
+    {
+      "feature": "origin_weather_severity",
       "importance": 0.0
     }
   ]

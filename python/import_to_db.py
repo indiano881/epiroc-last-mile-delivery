@@ -146,9 +146,10 @@ def main():
         distanceBucket, shipDow, shipWeek, shipMonth, shipYear,
         isShipHoliday, isDeliveryHoliday, daysToHoliday, holidayName, isHolidayWeek,
         originTempMax, originTempMin, originPrecipitation, originSnowfall, originWeatherSeverity,
+        freightIndex, fuelPrice, consumerSentiment,
         congestionScore, isRushHour, isMonthEnd, isQuarterEnd,
         carrierId, laneId, createdAt, updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     inserted = 0
@@ -201,6 +202,9 @@ def main():
                 float(row['origin_precipitation']) if pd.notna(row.get('origin_precipitation')) else None,  # originPrecipitation
                 float(row['origin_snowfall']) if pd.notna(row.get('origin_snowfall')) else None,  # originSnowfall
                 float(row['origin_weather_severity']) if pd.notna(row.get('origin_weather_severity')) else None,  # originWeatherSeverity
+                float(row['freight_index']) if pd.notna(row.get('freight_index')) else None,  # freightIndex
+                float(row['fuel_price']) if pd.notna(row.get('fuel_price')) else None,  # fuelPrice
+                float(row['consumer_sentiment']) if pd.notna(row.get('consumer_sentiment')) else None,  # consumerSentiment
                 float(row['congestion_score']) if pd.notna(row.get('congestion_score')) else None,  # congestionScore
                 bool(row.get('is_rush_hour', False)),  # isRushHour
                 bool(row.get('is_month_end', False)),  # isMonthEnd
