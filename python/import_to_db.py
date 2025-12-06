@@ -14,9 +14,11 @@ def sanitize_string(val):
     if val is None or pd.isna(val):
         return None
     s = str(val)
-    # Replace common unicode arrows and encode to ASCII, ignoring errors
-    s = s.replace('→', '->').replace('\u2192', '->')
-    return s.encode('ascii', 'ignore').decode('ascii')
+    # Replace common unicode arrows and other special characters
+    s = s.replace('→', '-').replace('\u2192', '-')
+    s = s.replace('xx', '')  # Remove 'xx' placeholders from zip codes
+    # Encode to ASCII, ignoring errors
+    return s.encode('ascii', 'ignore').decode('ascii').strip()
 
 # Paths
 CSV_PATH = Path(__file__).parent / "enriched_shipments.csv"
@@ -44,7 +46,7 @@ def main():
     cursor.execute("DELETE FROM Carrier")
     conn.commit()
 
-    now = datetime.now().isoformat()
+    now = datetime.now().strftime('%Y-%m-%dT%H:%M:%S.000Z')
 
     # Create carriers first
     print("\nCreating carriers...")
@@ -143,9 +145,10 @@ def main():
         actualTransitDays, otdDesignation, originZip, destZip, laneZip3Pair,
         distanceBucket, shipDow, shipWeek, shipMonth, shipYear,
         isShipHoliday, isDeliveryHoliday, daysToHoliday, holidayName, isHolidayWeek,
+        originTempMax, originTempMin, originPrecipitation, originSnowfall, originWeatherSeverity,
         congestionScore, isRushHour, isMonthEnd, isQuarterEnd,
         carrierId, laneId, createdAt, updatedAt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """
 
     inserted = 0
@@ -172,8 +175,8 @@ def main():
                 str(uuid.uuid4()),  # id
                 sanitize_string(row.get('load_id_pseudo', f'LOAD-{idx}'))[:50],  # loadId
                 sanitize_string(row.get('carrier_mode', 'LTL')),  # carrierMode
-                ship_date.isoformat(),  # actualShip
-                delivery_date.isoformat() if delivery_date else None,  # actualDelivery
+                ship_date.strftime('%Y-%m-%dT%H:%M:%S.000Z'),  # actualShip
+                delivery_date.strftime('%Y-%m-%dT%H:%M:%S.000Z') if delivery_date else None,  # actualDelivery
                 float(row['carrier_posted_service_days']) if pd.notna(row.get('carrier_posted_service_days')) else None,  # carrierServiceDays
                 float(row['truckload_service_days']) if pd.notna(row.get('truckload_service_days')) else None,  # truckloadServiceDays
                 float(row['customer_distance']) if pd.notna(row.get('customer_distance')) else 0.0,  # customerDistance
@@ -193,6 +196,11 @@ def main():
                 int(row['days_to_holiday']) if pd.notna(row.get('days_to_holiday')) else None,  # daysToHoliday
                 sanitize_string(row.get('holiday_name', ''))[:100] if pd.notna(row.get('holiday_name')) else None,  # holidayName
                 bool(row.get('is_holiday_week', False)),  # isHolidayWeek
+                float(row['origin_temp_max']) if pd.notna(row.get('origin_temp_max')) else None,  # originTempMax
+                float(row['origin_temp_min']) if pd.notna(row.get('origin_temp_min')) else None,  # originTempMin
+                float(row['origin_precipitation']) if pd.notna(row.get('origin_precipitation')) else None,  # originPrecipitation
+                float(row['origin_snowfall']) if pd.notna(row.get('origin_snowfall')) else None,  # originSnowfall
+                float(row['origin_weather_severity']) if pd.notna(row.get('origin_weather_severity')) else None,  # originWeatherSeverity
                 float(row['congestion_score']) if pd.notna(row.get('congestion_score')) else None,  # congestionScore
                 bool(row.get('is_rush_hour', False)),  # isRushHour
                 bool(row.get('is_month_end', False)),  # isMonthEnd
