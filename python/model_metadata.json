@@ -1,8 +1,8 @@
 {
   "version": "1.0.0",
-  "trained_at": "2025-12-05T21:04:00.861301",
-  "train_samples": 799,
-  "test_samples": 201,
+  "trained_at": "2025-12-06T10:33:41.543680",
+  "train_samples": 58370,
+  "test_samples": 14596,
   "features": [
     "customer_distance",
     "all_modes_goal_transit_days",
@@ -29,12 +29,12 @@
   ],
   "metrics": {
     "regression": {
-      "mae": 0.8412818908691406,
-      "rmse": 3.7427588168075987,
-      "r2": 0.15134847164154053
+      "mae": 0.5419253706932068,
+      "rmse": 2.4199578357207505,
+      "r2": 0.0561104416847229
     },
     "classification": {
-      "accuracy": 0.6716417910447762,
+      "accuracy": 0.7467799397095094,
       "classes": [
         "Delivered Early",
         "Late",
@@ -44,63 +44,79 @@
   },
   "feature_importance": [
     {
-      "feature": "lane_avg_transit_days",
-      "importance": 0.17286556959152222
-    },
-    {
-      "feature": "distance_bucket_encoded",
-      "importance": 0.16925324499607086
+      "feature": "all_modes_goal_transit_days",
+      "importance": 0.11685226857662201
     },
     {
       "feature": "lane_otd_rate",
-      "importance": 0.1629943698644638
+      "importance": 0.11100203543901443
     },
     {
       "feature": "carrier_otd_rate",
-      "importance": 0.07884825021028519
-    },
-    {
-      "feature": "ship_week",
-      "importance": 0.07870449870824814
+      "importance": 0.09108088910579681
     },
     {
       "feature": "carrier_mode_encoded",
-      "importance": 0.06584152579307556
-    },
-    {
-      "feature": "all_modes_goal_transit_days",
-      "importance": 0.06541141122579575
-    },
-    {
-      "feature": "days_to_holiday",
-      "importance": 0.06284648925065994
-    },
-    {
-      "feature": "congestion_score",
-      "importance": 0.045357998460531235
+      "importance": 0.07662934809923172
     },
     {
       "feature": "customer_distance",
-      "importance": 0.04130794480443001
+      "importance": 0.07027620077133179
     },
     {
-      "feature": "ship_dow",
-      "importance": 0.023088008165359497
+      "feature": "is_quarter_end_encoded",
+      "importance": 0.06393226236104965
+    },
+    {
+      "feature": "lane_avg_transit_days",
+      "importance": 0.05758741497993469
+    },
+    {
+      "feature": "distance_bucket_encoded",
+      "importance": 0.04578309506177902
     },
     {
       "feature": "is_rush_hour_encoded",
-      "importance": 0.02084091305732727
+      "importance": 0.04532197490334511
+    },
+    {
+      "feature": "days_to_holiday",
+      "importance": 0.04469497501850128
+    },
+    {
+      "feature": "ship_dow",
+      "importance": 0.04424907639622688
+    },
+    {
+      "feature": "is_weekend_encoded",
+      "importance": 0.04402938485145569
     },
     {
       "feature": "is_holiday_week_encoded",
-      "importance": 0.010860944166779518
+      "importance": 0.04290967062115669
+    },
+    {
+      "feature": "ship_week",
+      "importance": 0.04166222736239433
+    },
+    {
+      "feature": "ship_month",
+      "importance": 0.04051603749394417
+    },
+    {
+      "feature": "congestion_score",
+      "importance": 0.03632914274930954
+    },
+    {
+      "feature": "is_month_end_encoded",
+      "importance": 0.016330646350979805
     },
     {
       "feature": "is_ship_holiday_encoded",
-      "importance": 0.0017788733821362257
+      "importance": 0.010813244618475437
     },
     {
-      "feature": "consumer_sentiment",
+      "feature": "freight_index",
       "importance": 0.0
     },
     {
@@ -108,27 +124,11 @@
       "importance": 0.0
     },
     {
-      "feature": "freight_index",
+      "feature": "consumer_sentiment",
       "importance": 0.0
     },
     {
       "feature": "origin_weather_severity",
-      "importance": 0.0
-    },
-    {
-      "feature": "ship_month",
-      "importance": 0.0
-    },
-    {
-      "feature": "is_weekend_encoded",
-      "importance": 0.0
-    },
-    {
-      "feature": "is_month_end_encoded",
-      "importance": 0.0
-    },
-    {
-      "feature": "is_quarter_end_encoded",
       "importance": 0.0
     }
   ]
